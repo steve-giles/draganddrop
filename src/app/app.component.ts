@@ -1,7 +1,4 @@
-import { Component } from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {CKEditor4} from 'ckeditor4-angular';
-import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -9,11 +6,6 @@ import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  /**
-   * Provides access to properties and methods of the CkEditor
-   */
-  editorControl: CKEditor4.Editor;
-
   /**
    * CKEditor configuration
    */
@@ -29,11 +21,14 @@ export class AppComponent {
     height: '700px'
   };
 
-  templateEditor: FormGroup;
+  fieldMap: Map<string, string> = new Map<string, string>([
+    ['studentFirstName', '{{ student.firstName }}'],
+    ['studentLastName', '{{ student.lastName }}'],
+    ['courseName', '{{ course.name }}'],
+    ['courseHours', '{{ course.hours }}']
+  ]);
 
-
-  constructor(private formBuilder: FormBuilder) {
-
+  constructor() {
   }
 
   allowDrop(ev): void {
@@ -41,42 +36,20 @@ export class AppComponent {
   }
 
   drag(ev): void {
-    ev.dataTransfer.setData('text', ev.target.id);
+    ev.dataTransfer.setData('dragElement', ev.target.id);
   }
 
   drop(ev): void {
     ev.preventDefault();
-    debugger;
-    var data = ev.dataTransfer.getData("text");
+    const data = ev.dataTransfer.getData('dragElement');
+    const dataValue = this.fieldMap.get(data);
 
-    var valuex = '';
-
-    if (data === 'studentFirstName') {
-      valuex = '{{ student.firstName }}';
-    }
-
-    //var valuex = document.getElementById(data).textContent;
-    //console.log(document.getElementById(data));
-    //ev.target.appendChild(document.getElementById(data));
-    //debugger;
-    console.log('start: ' + ev.target.selectionStart);
-    console.log('end: ' + ev.target.selectionEnd);
-
-    var startPos = ev.target.selectionStart;
-    var endPos = ev.target.selectionEnd;
+    const startPos = ev.target.selectionStart;
+    const endPos = ev.target.selectionEnd;
 
     ev.target.value = ev.target.value.substring(0, startPos)
-      + valuex
+      + dataValue
       + ev.target.value.substring(endPos, ev.target.value.length);
-
-    //ev.target.value = data;
-    //ev.target.appendChild('steve');
-    // ev.target.dataValue =
-    //   '<span class="h-card">' +
-    //   '<a href="mailto:' + 'contact.email' + '" class="p-name u-email">' + 'contact.name' + '</a>' +
-    //   ' ' +
-    //   '<span class="p-tel">' + 'contact.tel' + '</span>' +
-    //   '</span>';
   }
 
 
